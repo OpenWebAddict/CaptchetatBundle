@@ -2,7 +2,7 @@
 services:
   OpenWebAddict\CaptchetatBundle\Service\CaptchetatService:
     arguments:
-      $sandbox: '%monbundle.sandbox%'
-      $public_key: '%monbundle.public_key%'
-      $private_key: '%monbundle.private_key%'
+      $sandbox: '%captchetat.sandbox%'
+      $public_key: '%captchetat.public_key%'
+      $private_key: '%captchetat.private_key%'
 
