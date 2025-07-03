@@ -44,31 +44,33 @@ interface CaptchetatServiceInterface
     public function isServiceUp(string $token): bool;
 
     /**
-     * Returns the CaptchEtat API response.
-     *
-     * @param string $token
-     *   CaptchEtat API access token.
-     * @param Request $request
-     *   The current http request.
-     *
-     * @return Response
-     *   Returns the HTTP Response for the CaptchEtat API element.
+     * Returns the CaptchEtat API URL.
+     * 
+     * @param string $captchaObjectType
+     *   CaptchEtat API object type ( image | sound )
+     * 
+     * @param string $captchaType
+     *      Captcha name to get
+     * 
+     * @return string
+     *   Returns the CaptchEtat  .
      */
-    public function getCaptcha(string $token, Request $request): Response;
+    public function getCaptcha(
+        string $captchaObjectType = 'image', 
+        string $captchaType = 'numerique6_7CaptchaFR', 
+        ?string $captchaId = null
+    ): string;
 
     /**
      * Validates the user submission.
      *
-     * @param string $captcha_uuid
+     * @param string $captchaUuid
      *   The captcha unique ID.
-     * @param string $user_entered_captcha_code
+     * @param string $userEnteredCode
      *   The user entered captcha code.
-     * @param string $token
-     *   CaptchEtat API access token.
      *
      * @return bool
      *   TRUE if validation successful, FALSE otherwise.
     */
-    public function validateCaptcha(string $captcha_uuid, string $user_entered_captcha_code, string $token): bool;
-
+    public function validateCaptcha(string $captchaUuid, string $userEnteredCode): bool;
 }

@@ -4,9 +4,10 @@ namespace OpenWebAddict\CaptchetatBundle\Service;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class CaptchetatService //implements CaptchetatServiceInterface
+class CaptchetatService implements CaptchetatServiceInterface
 {
 
     private const API_URL='https://api.piste.gouv.fr';
@@ -133,6 +134,87 @@ class CaptchetatService //implements CaptchetatServiceInterface
 
         return false;
     }
-    
+
+    public function getCaptcha(string $captchaObjectType = 'image', string $captchaType = 'numerique6_7CaptchaFR', ?string $captchaId = null): string
+    {
+        $availableTypes = [
+            'image',
+            'sound',
+        ];
+
+        if (!in_array($captchaObjectType, $availableTypes)) {
+            return '';
+        }
+
+        $token = $this->getApiToken();
+        if (empty($token)) {
+            return '';
+        }
+
+        $url = $this->getApiUrl() . '/piste/captchetat/v2/simple-captcha-endpoint';
+        $queryParams = [
+            'get' => $captchaObjectType,
+            'c' => $captchaType,
+        ];
+
+        $option = [
+            'headers' => [
+                'Authorization' => 'Bearer '.$token,
+            ],
+            'verify_host' => false,
+            'verify_peer' => false,
+        ];
+
+        if ($captchaId) {
+            $queryParams['t'] = $captchaId;
+        }
+
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'query' => $queryParams,
+                'options' => $option,
+            ]);
+
+            return $response->getContent();
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    public function validateCaptcha(string $captchaUuid, string $userEnteredCode): bool
+    {
+        $token = $this->getApiToken();
+        if (empty($token)) {
+            return false;
+        }
+
+        $url = $this->getApiUrl() . '/piste/captchetat/v2/valider-captcha';
+        $data = [
+            'uuid' => $captchaUuid,
+            'code' => $userEnteredCode,
+        ];
+
+        $options = [
+            'headers' => [
+                'Authorization' => 'Bearer '.$token,
+            ],
+            'verify_host' => false,
+            'verify_peer' => false,
+        ];
+        
+        try {
+            $response = $this->httpClient->request('POST', $url, [
+                'form_params' => $data,
+                'options' => $options,
+            ]);
+
+            $contents = $response->getContent();
+            
+            return "true" === $contents;
+
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 
 }
