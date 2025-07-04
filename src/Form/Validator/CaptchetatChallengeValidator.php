@@ -6,7 +6,6 @@ use OpenWebAddict\CaptchetatBundle\Form\Constraint\CaptchetatValidConstraint;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use UnexpectedValueException;
 
 class CaptchetatChallengeValidator extends ConstraintValidator
 {
@@ -21,20 +20,16 @@ class CaptchetatChallengeValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, CaptchetatValidConstraint::class);
         }
 
-        if (!isset($value['captchetatAnswer']) || !isset($value['captchetatUuid'])) {
-            throw new UnexpectedValueException($value, 'array');
-        }
-
         $captchaAnswer = $value['captchetatAnswer'];
         $captchaUuid = $value['captchetatUuid'];
 
         if (null === $captchaAnswer || null === $captchaUuid) {
             $this->context
-                ->buildViolation($constraint->message)
+                ->buildViolation("Aucune valeur saisie dans le captcha")
                 ->addViolation();
         } elseif (!$this->challengeValidator->validate($captchaUuid, $captchaAnswer)) {
             $this->context
-                ->buildViolation($constraint->message)
+                ->buildViolation("Le résultat du captcha est invalide")
                 ->addViolation();
         }
     }
