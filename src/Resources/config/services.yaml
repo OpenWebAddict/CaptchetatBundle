@@ -1,0 +1,8 @@
+# config/services.yaml
+services:
+  OpenWebAddict\CaptchetatBundle\Service\CaptchetatService:
+    arguments:
+      $sandbox: '%captchetat.sandbox%'
+      $public_key: '%captchetat.public_key%'
+      $private_key: '%captchetat.private_key%'
+
